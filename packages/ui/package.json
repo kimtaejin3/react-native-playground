@@ -9,12 +9,14 @@
     "lint": "eslint src"
   },
   "peerDependencies": {
+    "nativewind": "*",
     "react": "*",
     "react-native": "*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "@repo/eslint-config": "workspace:*",
+    "nativewind": "^4.2.5",
     "typescript": "^5.6.0"
   }
 }

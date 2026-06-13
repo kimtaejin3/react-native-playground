@@ -1,30 +1,20 @@
-import { Pressable, Text, StyleSheet, type ViewStyle } from "react-native";
+import { Pressable, Text, type StyleProp, type ViewStyle } from "react-native";
 
 export type ButtonProps = {
   title: string;
   onPress?: () => void;
-  style?: ViewStyle;
+  className?: string;
+  style?: StyleProp<ViewStyle>;
 };
 
-export function Button({ title, onPress, style }: ButtonProps) {
+export function Button({ title, onPress, className, style }: ButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.base, pressed && styles.pressed, style]}
+      style={style}
+      className={`items-center justify-center rounded-[10px] bg-[#174ab9] px-5 py-3 active:opacity-70 ${className ?? ""}`}
     >
-      <Text style={styles.label}>{title}</Text>
+      <Text className="text-base font-semibold text-white">{title}</Text>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: "#2563eb",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  pressed: { opacity: 0.7 },
-  label: { color: "#fff", fontSize: 16, fontWeight: "600" },
-});
