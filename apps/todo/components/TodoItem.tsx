@@ -2,7 +2,7 @@ import { Text, View, Pressable } from "react-native";
 import Animated, { Keyframe, LinearTransition } from "react-native-reanimated";
 import { Card } from "@repo/ui";
 import { Lottie, checkDraw } from "@repo/lottie";
-import { useTodos, type Todo } from "../context/TodoContext";
+import type { Todo } from "../context/TodoContext";
 
 // 자리 차지 후 살짝 커지며 등장 (리스트가 먼저 밀린 뒤 나오도록 delay)
 const ItemEnter = new Keyframe({
@@ -20,12 +20,11 @@ const ItemExit = new Keyframe({
 
 export type TodoItemProps = {
   item: Todo;
+  onToggle: (id: string) => void;
   onLongPress: (id: string) => void;
 };
 
-export function TodoItem({ item, onLongPress }: TodoItemProps) {
-  const { toggleTodo } = useTodos();
-
+export function TodoItem({ item, onToggle, onLongPress }: TodoItemProps) {
   return (
     <Animated.View
       entering={ItemEnter}
@@ -33,7 +32,7 @@ export function TodoItem({ item, onLongPress }: TodoItemProps) {
       layout={LinearTransition.duration(400)}
     >
       <Pressable
-        onPress={() => toggleTodo(item.id)}
+        onPress={() => onToggle(item.id)}
         onLongPress={() => onLongPress(item.id)}
         delayLongPress={350}
       >

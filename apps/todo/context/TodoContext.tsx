@@ -13,10 +13,14 @@ export type Todo = {
   done: boolean;
 };
 
+const byDone = (a: Todo, b: Todo) => Number(a.done) - Number(b.done);
+
 type TodoContextValue = {
   todos: Todo[];
+  sortedTodos: Todo[];
   addTodo: (text: string, description: string) => void;
-  toggleTodo: (id: string) => void;
+  /** 토글로 정렬 위치가 바뀌면 true 반환 */
+  toggleTodo: (id: string) => boolean;
   deleteTodo: (id: string) => void;
   editTodo: (id: string, text: string, description: string) => void;
 };
@@ -26,6 +30,9 @@ const TodoContext = createContext<TodoContextValue | null>(null);
 export function TodoProvider({ children }: { children: ReactNode }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const idRef = useRef(0);
+
+  // 파생 도메인 데이터: 미완료 먼저, 완료는 아래로 (안정 정렬)
+  const sortedTodos = [...todos].sort(byDone);
 
   const addTodo = (text: string, description: string) => {
     const trimmed = text.trim();
@@ -42,10 +49,14 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     ]);
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
+  const toggleTodo = (id: string): boolean => {
+    const before = sortedTodos.findIndex((t) => t.id === id);
+    const next = todos.map((t) =>
+      t.id === id ? { ...t, done: !t.done } : t,
     );
+    const after = [...next].sort(byDone).findIndex((t) => t.id === id);
+    setTodos(next);
+    return before !== after;
   };
 
   const deleteTodo = (id: string) => {
@@ -66,7 +77,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
   return (
     <TodoContext.Provider
-      value={{ todos, addTodo, toggleTodo, deleteTodo, editTodo }}
+      value={{ todos, sortedTodos, addTodo, toggleTodo, deleteTodo, editTodo }}
     >
       {children}
     </TodoContext.Provider>

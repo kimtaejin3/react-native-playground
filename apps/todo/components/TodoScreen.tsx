@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { View, FlatList } from "react-native";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { successBurst } from "@repo/lottie";
 import { useTodos } from "../context/TodoContext";
 import { useLottieOverlay } from "../context/LottieOverlayContext";
 import { TodoHeader } from "./TodoHeader";
 import { TodoInput } from "./TodoInput";
-import { TodoItem } from "./TodoItem";
+import { TodoList } from "./TodoList";
 import { TodoActionSheet } from "./TodoActionSheet";
 import { EditTodoModal } from "./EditTodoModal";
 
@@ -20,26 +20,12 @@ export function TodoScreen() {
   const [selected, setSelected] = useState<Selection>(null);
   const selectedTodo = todos.find((t) => t.id === selected?.id);
 
-  const sortedTodos = [...todos].sort(
-    (a, b) => Number(a.done) - Number(b.done),
-  );
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f1f5f9" }}>
       <View className="flex-1 gap-3 p-5">
         <TodoHeader />
         <TodoInput />
-        <FlatList
-          data={sortedTodos}
-          keyExtractor={(item) => `${item.id}-${item.done ? "d" : "u"}`}
-          contentContainerClassName="gap-2.5 pb-5 pt-1"
-          renderItem={({ item }) => (
-            <TodoItem
-              item={item}
-              onLongPress={(id) => setSelected({ id, mode: "menu" })}
-            />
-          )}
-        />
+        <TodoList onLongPress={(id) => setSelected({ id, mode: "menu" })} />
       </View>
 
       <TodoActionSheet
