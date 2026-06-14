@@ -9,11 +9,11 @@ export const TIMING = {
 } as const;
 
 const SCALE_FROM = 0.85; // 등장/사라짐의 시작·끝 크기
-const CHECK_SETTLE_BUFFER = 120; // 안착 후 체크 그리기까지 여유(ms)
+const CHECK_SETTLE_BUFFER = 110; // 안착 후 체크 그리기까지 여유(ms)
 
 // 파생값: "결과 숫자"가 아니라 "관계"로 정의 → 기준값 바꾸면 자동 반영
 const ENTER_DELAY = TIMING.layout; // 슬라이드가 끝난 뒤 등장
-export const CHECK_DRAW_DELAY = TIMING.layout + CHECK_SETTLE_BUFFER - 10; // 안착 후 체크
+export const CHECK_DRAW_DELAY = TIMING.layout + CHECK_SETTLE_BUFFER; // 안착 후 체크
 
 // 자리 차지 후 살짝 커지며 등장 (리스트가 먼저 밀린 뒤 나오도록 delay)
 export const ItemEnter = new Keyframe({
