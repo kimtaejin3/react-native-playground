@@ -1,0 +1,4 @@
+{
+  "extends": "@repo/tsconfig/expo.json",
+  "include": ["**/*.ts", "**/*.tsx"]
+}
