@@ -13,6 +13,15 @@ export default function TabLayout() {
           height: 80,
           borderRadius: 50,
           paddingTop: 5,
+          backgroundColor: colors.WHITE,
+
+          position: "absolute",
+
+          elevation: 8,
+          shadowColor: "#000",
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          shadowOffset: { width: 0, height: 4 },
         },
       }}
     >
@@ -20,7 +29,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "홈",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <MaterialIcons name="home" size={20} color={color} />
           ),
         }}
@@ -29,7 +38,7 @@ export default function TabLayout() {
         name="my"
         options={{
           title: "내 프로필",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <MaterialIcons name="person" size={20} color={color} />
           ),
         }}
@@ -38,7 +47,7 @@ export default function TabLayout() {
         name="setting"
         options={{
           title: "설정",
-          tabBarIcon: ({ color, focused }) => (
+          tabBarIcon: ({ color }) => (
             <MaterialIcons name="settings" size={18} color={color} />
           ),
         }}
