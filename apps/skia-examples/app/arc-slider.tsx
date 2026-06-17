@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native";
 import { ArcSlider } from "../arcSlider";
 
-export default function Home() {
+export default function ArcSliderScreen() {
   return (
     <View style={styles.container}>
       <ArcSlider />
