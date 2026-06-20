@@ -18,19 +18,16 @@ export default function Pomodoro() {
   const { colors, trackColor, maxMinutes, addSession } = useTheme();
   const MAX_SECONDS = maxMinutes * 60;
 
-  // 기본 25분 (단, 최대 분 이내로 클램프)
-  const progress = useSharedValue(Math.min(25, maxMinutes) / maxMinutes);
-  const [totalSeconds, setTotalSeconds] = useState(
-    Math.min(25, maxMinutes) * 60,
-  );
+  const progress = useSharedValue(0);
+  const [totalSeconds, setTotalSeconds] = useState(0);
   const [cta, setCta] = useState<{ id: number; minutes: number } | null>(null);
   const [running, setRunning] = useState(false);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [endModal, setEndModal] = useState<{ minutes: number } | null>(null);
+
   const ctaId = useRef(0);
   const prevMax = useRef(maxMinutes);
 
-  // progress → 분 단위 시간(초) 반영
   useAnimatedReaction(
     () => Math.round(progress.value * maxMinutes),
     (min, prev) => {
@@ -39,7 +36,6 @@ export default function Pomodoro() {
     [maxMinutes],
   );
 
-  // 최대 분이 바뀌면 현재 설정 분을 새 최대로 클램프
   useEffect(() => {
     const curMin = Math.round(progress.value * prevMax.current);
     const newMin = Math.min(curMin, maxMinutes);
@@ -48,7 +44,6 @@ export default function Pomodoro() {
     prevMax.current = maxMinutes;
   }, [maxMinutes, progress]);
 
-  // running이면 카운트다운: 매초 ↓, progress(호) ↓, 마지막 10초 진동, 종료 시 모달
   useEffect(() => {
     if (!running) {
       setRemaining(null);

@@ -65,10 +65,11 @@ type AppContextValue = {
   setMaxMinutes: (m: number) => void;
   sessions: Session[];
   addSession: (s: Omit<Session, "id">) => void;
-  colorRef: RefObject<BottomSheetModal | null>;
+  colorOpen: boolean; // 색상 플로팅 카드 표시 여부
+  openColor: () => void;
+  closeColor: () => void;
   settingsRef: RefObject<BottomSheetModal | null>;
   historyRef: RefObject<BottomSheetModal | null>;
-  openColor: () => void;
   openSettings: () => void;
   openHistory: () => void;
 };
@@ -81,7 +82,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const idRef = useRef(0);
 
-  const colorRef = useRef<BottomSheetModal>(null);
+  const [colorOpen, setColorOpen] = useState(false);
   const settingsRef = useRef<BottomSheetModal>(null);
   const historyRef = useRef<BottomSheetModal>(null);
   const loaded = useRef(false);
@@ -145,10 +146,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setMaxMinutes,
         sessions,
         addSession,
-        colorRef,
+        colorOpen,
+        openColor: () => setColorOpen(true),
+        closeColor: () => setColorOpen(false),
         settingsRef,
         historyRef,
-        openColor: () => colorRef.current?.present(),
         openSettings: () => settingsRef.current?.present(),
         openHistory: () => historyRef.current?.present(),
       }}

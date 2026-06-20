@@ -1,5 +1,5 @@
 import { Pressable } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
 
 export function HistoryButton() {
@@ -10,7 +10,7 @@ export function HistoryButton() {
       style={{ paddingHorizontal: 4 }}
       onPress={openHistory}
     >
-      <MaterialIcons name="format-list-bulleted" size={24} color={iconColor} />
+      <FontAwesome name="th-list" size={20} color={iconColor} />
     </Pressable>
   );
 }

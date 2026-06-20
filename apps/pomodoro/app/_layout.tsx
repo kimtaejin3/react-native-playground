@@ -10,7 +10,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import { HistoryButton } from "../components/HistoryButton";
 import { PaletteButton } from "../components/PaletteButton";
 import { SettingsButton } from "../components/SettingsButton";
-import { ColorSheet } from "../components/ColorSheet";
+import { ColorPicker } from "../components/ColorPicker";
 import { SettingsSheet } from "../components/SettingsSheet";
 import { HistorySheet } from "../components/HistorySheet";
 
@@ -44,7 +44,7 @@ export default function RootLayout() {
               }}
             />
           </Stack>
-          <ColorSheet />
+          <ColorPicker />
           <SettingsSheet />
           <HistorySheet />
         </BottomSheetModalProvider>

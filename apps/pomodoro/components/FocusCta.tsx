@@ -14,7 +14,7 @@ const STEP = 30; // 글자당 지연(ms) — 왼→오 순차
 // 드래그 끝 → 아이콘은 아래에서 위로, 텍스트는 글자마다 왼→오
 // running이면 "그만하기" + 정지 아이콘
 export function FocusCta({ minutes, color, running, onPress }: FocusCtaProps) {
-  const label = running ? "그만하기" : `${minutes}분 집중 시작!`;
+  const label = running ? "종료하기" : `${minutes}분 집중 시작`;
   const chars = [...label];
 
   return (
