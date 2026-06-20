@@ -4,18 +4,26 @@ import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
 const ACTIVITIES = ["공부", "독서", "코딩", "운동", "글쓰기", "휴식", "기타"];
 
 const fmt = (sec: number) =>
-  `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(
-    sec % 60,
-  ).padStart(2, "0")}`;
+  `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(
+    2,
+    "0",
+  )}`;
 
 export type EndModalProps = {
   visible: boolean;
   minutes: number;
+  color: string; // 선택한 색
   onSave: (activity: string) => void;
   onClose: () => void;
 };
 
-export function EndModal({ visible, minutes, onSave, onClose }: EndModalProps) {
+export function EndModal({
+  visible,
+  minutes,
+  color,
+  onSave,
+  onClose,
+}: EndModalProps) {
   // 타이머 종료 후 경과 시간 (인지 못한 시간 알려주기용)
   const [overtime, setOvertime] = useState(0);
   const [activity, setActivity] = useState<string | null>(null);
@@ -43,12 +51,12 @@ export function EndModal({ visible, minutes, onSave, onClose }: EndModalProps) {
     >
       <View style={styles.backdrop}>
         <View style={styles.card}>
-          <Text style={styles.title}>🎉 {minutes}분 집중 완료!</Text>
+          <Text style={styles.title}>{minutes}분 집중 완료!</Text>
 
           <Text style={styles.label}>종료 후 경과</Text>
-          <Text style={styles.overtime}>+{fmt(overtime)}</Text>
+          <Text style={[styles.overtime, { color }]}>{fmt(overtime)}</Text>
 
-          <Text style={styles.label}>무엇을 했나요?</Text>
+          <Text style={styles.label}>무엇을 했나요? (선택)</Text>
           <View style={styles.chips}>
             {ACTIVITIES.map((a) => {
               const sel = activity === a;
@@ -67,11 +75,10 @@ export function EndModal({ visible, minutes, onSave, onClose }: EndModalProps) {
           </View>
 
           <Pressable
-            disabled={!activity}
-            onPress={() => activity && onSave(activity)}
-            style={[styles.save, !activity && styles.saveDisabled]}
+            onPress={() => (activity ? onSave(activity) : onClose())}
+            style={styles.save}
           >
-            <Text style={styles.saveText}>저장</Text>
+            <Text style={styles.saveText}>{activity ? "저장" : "닫기"}</Text>
           </Pressable>
         </View>
       </View>
@@ -116,6 +123,5 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 14,
   },
-  saveDisabled: { backgroundColor: "#cbd5e1" },
   saveText: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

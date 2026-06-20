@@ -124,6 +124,7 @@ export default function Pomodoro() {
       <EndModal
         visible={endModal !== null}
         minutes={endModal?.minutes ?? 0}
+        color={colors.slider}
         onSave={(activity) => {
           if (endModal) {
             addSession({
