@@ -60,6 +60,7 @@ type AppContextValue = {
   colors: ThemeColors;
   setColor: (key: keyof ThemeColors, value: string) => void;
   iconColor: string;
+  trackColor: string; // 슬라이더 트랙(빈 호) — 배경에 맞춰 조정
   maxMinutes: number;
   setMaxMinutes: (m: number) => void;
   sessions: Session[];
@@ -129,12 +130,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     ? mix(colors.slider, "#ffffff", 0.55)
     : mix(colors.slider, "#0f172a", 0.45);
 
+  const trackColor = isDarkBg(colors.background)
+    ? mix(colors.background, "#ffffff", 0.18)
+    : "#e2e8f0";
+
   return (
     <AppContext.Provider
       value={{
         colors,
         setColor,
         iconColor,
+        trackColor,
         maxMinutes,
         setMaxMinutes,
         sessions,

@@ -15,7 +15,7 @@ import { EndModal } from "../components/EndModal";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Pomodoro() {
-  const { colors, maxMinutes, addSession } = useTheme();
+  const { colors, trackColor, maxMinutes, addSession } = useTheme();
   const MAX_SECONDS = maxMinutes * 60;
 
   // 기본 25분 (단, 최대 분 이내로 클램프)
@@ -114,6 +114,7 @@ export default function Pomodoro() {
         <ArcSlider
           progress={progress}
           color={colors.slider}
+          trackColor={trackColor}
           steps={maxMinutes}
           locked={running}
           onStart={() => setCta(null)}

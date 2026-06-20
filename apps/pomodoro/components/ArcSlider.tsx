@@ -20,6 +20,7 @@ const SWEEP = 180; // 위쪽 반원
 export type ArcSliderProps = {
   progress: SharedValue<number>; // 0~1 (외부에서 소유)
   color: string; // 진행 호 + 노브 색
+  trackColor: string; // 빈 호(트랙) 색
   steps: number; // 분 단위 스냅 칸 수 (= 최대 분)
   locked?: boolean; // true면 터치 잠금 + 노브 숨김
   onStart?: () => void; // 드래그 시작
@@ -29,6 +30,7 @@ export type ArcSliderProps = {
 export function ArcSlider({
   progress,
   color,
+  trackColor,
   steps,
   locked = false,
   onStart,
@@ -102,7 +104,7 @@ export function ArcSlider({
           style="stroke"
           strokeWidth={STROKE}
           strokeCap="round"
-          color="#e2e8f0"
+          color={trackColor}
         />
         <Path
           path={arc}
