@@ -8,6 +8,7 @@ import {
   type SharedValue,
 } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import { useTheme } from "../context/ThemeContext";
 
 const SIZE = 350;
 const STROKE = 25;
@@ -19,8 +20,6 @@ const SWEEP = 180; // 위쪽 반원
 
 export type ArcSliderProps = {
   progress: SharedValue<number>; // 0~1 (외부에서 소유)
-  color: string; // 진행 호 + 노브 색
-  trackColor: string; // 빈 호(트랙) 색
   steps: number; // 분 단위 스냅 칸 수 (= 최대 분)
   locked?: boolean; // true면 터치 잠금 + 노브 숨김
   onStart?: () => void; // 드래그 시작
@@ -29,13 +28,13 @@ export type ArcSliderProps = {
 
 export function ArcSlider({
   progress,
-  color,
-  trackColor,
   steps,
   locked = false,
   onStart,
   onSettle,
 }: ArcSliderProps) {
+  const { colors, trackColor } = useTheme();
+  const color = colors.slider;
   const arc = useMemo(() => {
     const p = Skia.Path.Make();
     p.addArc(Skia.XYWHRect(CX - R, CY - R, 2 * R, 2 * R), START, SWEEP);

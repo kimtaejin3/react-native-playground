@@ -1,10 +1,10 @@
 import { Pressable, View, StyleSheet } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../context/ThemeContext";
 
 export type FocusCtaProps = {
   minutes: number;
-  color: string;
   running: boolean;
   onPress: () => void;
 };
@@ -12,8 +12,9 @@ export type FocusCtaProps = {
 const STEP = 30; // 글자당 지연(ms) — 왼→오 순차
 
 // 드래그 끝 → 아이콘은 아래에서 위로, 텍스트는 글자마다 왼→오
-// running이면 "그만하기" + 정지 아이콘
-export function FocusCta({ minutes, color, running, onPress }: FocusCtaProps) {
+// running이면 "종료하기" + 정지 아이콘
+export function FocusCta({ minutes, running, onPress }: FocusCtaProps) {
+  const color = useTheme().colors.slider;
   const label = running ? "종료하기" : `${minutes}분 집중 시작`;
   const chars = [...label];
 

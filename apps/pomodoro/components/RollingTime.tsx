@@ -6,6 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useTheme } from "../context/ThemeContext";
 
 const DIGIT_H = 84; // 한 자릿수 높이(=글자 height)
 const DIGIT_W = 50; // 한 자릿수 폭
@@ -43,13 +44,13 @@ const tens = (n: number) => Math.floor(n / 10);
 const ones = (n: number) => n % 10;
 
 export type RollingTimeProps = {
-  totalSeconds: number; // 0 ~ 3600
-  color: string;
+  seconds: number; // 0 ~ 3600 (고른 값이든 남은 값이든 동일하게 표시)
 };
 
-export function RollingTime({ totalSeconds, color }: RollingTimeProps) {
-  const m = Math.floor(totalSeconds / 60);
-  const s = totalSeconds % 60;
+export function RollingTime({ seconds }: RollingTimeProps) {
+  const color = useTheme().colors.number;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
 
   return (
     <View style={styles.row}>

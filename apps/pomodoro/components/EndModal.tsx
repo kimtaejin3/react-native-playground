@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+import { useTheme } from "../context/ThemeContext";
 
 const ACTIVITIES = ["공부", "독서", "코딩", "운동", "글쓰기", "휴식", "기타"];
 
@@ -12,18 +13,12 @@ const fmt = (sec: number) =>
 export type EndModalProps = {
   visible: boolean;
   minutes: number;
-  color: string; // 선택한 색
   onSave: (activity: string) => void;
   onClose: () => void;
 };
 
-export function EndModal({
-  visible,
-  minutes,
-  color,
-  onSave,
-  onClose,
-}: EndModalProps) {
+export function EndModal({ visible, minutes, onSave, onClose }: EndModalProps) {
+  const color = useTheme().colors.slider; // 선택한 색
   // 타이머 종료 후 경과 시간 (인지 못한 시간 알려주기용)
   const [overtime, setOvertime] = useState(0);
   const [activity, setActivity] = useState<string | null>(null);

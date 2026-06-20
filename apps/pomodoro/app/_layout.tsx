@@ -7,6 +7,7 @@ import {
   ArchivoBlack_400Regular,
 } from "@expo-google-fonts/archivo-black";
 import { ThemeProvider } from "../context/ThemeContext";
+import { OverlayProvider } from "../lib/overlay";
 import { HistoryButton } from "../components/HistoryButton";
 import { PaletteButton } from "../components/PaletteButton";
 import { SettingsButton } from "../components/SettingsButton";
@@ -32,21 +33,23 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         <BottomSheetModalProvider>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-              name="index"
-              options={{
-                headerShown: true,
-                headerTitle: "",
-                headerTransparent: true,
-                headerShadowVisible: false,
-                headerRight: () => <HeaderRight />,
-              }}
-            />
-          </Stack>
-          <ColorPicker />
-          <SettingsSheet />
-          <HistorySheet />
+          <OverlayProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen
+                name="index"
+                options={{
+                  headerShown: true,
+                  headerTitle: "",
+                  headerTransparent: true,
+                  headerShadowVisible: false,
+                  headerRight: () => <HeaderRight />,
+                }}
+              />
+            </Stack>
+            <ColorPicker />
+            <SettingsSheet />
+            <HistorySheet />
+          </OverlayProvider>
         </BottomSheetModalProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
