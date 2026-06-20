@@ -1,0 +1,7 @@
+{
+  "extends": "@repo/tsconfig/expo.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": false
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}
