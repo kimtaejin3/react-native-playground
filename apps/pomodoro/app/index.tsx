@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useSharedValue, withTiming, Easing } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
-import {
-  activateKeepAwakeAsync,
-  deactivateKeepAwake,
-} from "expo-keep-awake";
 import { RollingTime } from "../components/RollingTime";
 import { TimerControls } from "../components/TimerControls";
 import { EndModal } from "../components/EndModal";
 import { overlay } from "../lib/overlay";
 import { useMinuteDial } from "../hooks/useMinuteDial";
 import { useCountdown } from "../hooks/useCountdown";
+import { useKeepAwakeWhile } from "../hooks/useKeepAwakeWhile";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Pomodoro() {
@@ -21,9 +18,11 @@ export default function Pomodoro() {
 
   const progress = useSharedValue(0);
 
-  const { minutes } = useMinuteDial(progress, maxMinutes);
+  const { selectedMinutes } = useMinuteDial(progress, maxMinutes);
 
   const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  useKeepAwakeWhile(isTimerRunning && keepAwakeEnabled);
 
   const remainingSeconds = useCountdown(
     isTimerRunning,
@@ -66,17 +65,8 @@ export default function Pomodoro() {
 
   const displaySeconds = (() => {
     if (isTimerRunning && remainingSeconds !== null) return remainingSeconds;
-    return minutes * 60;
+    return selectedMinutes * 60;
   })();
-
-  // 실행 중에만 화면 켜둠 (설정으로 끌 수 있음)
-  useEffect(() => {
-    if (!(isTimerRunning && keepAwakeEnabled)) return;
-    activateKeepAwakeAsync();
-    return () => {
-      deactivateKeepAwake();
-    };
-  }, [isTimerRunning, keepAwakeEnabled]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
