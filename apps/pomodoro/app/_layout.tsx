@@ -13,7 +13,6 @@ import { PaletteButton } from "../components/PaletteButton";
 import { SettingsButton } from "../components/SettingsButton";
 import { ColorPicker } from "../components/ColorPicker";
 import { SettingsSheet } from "../components/SettingsSheet";
-import { HistorySheet } from "../components/HistorySheet";
 
 function HeaderRight() {
   return (
@@ -45,10 +44,18 @@ export default function RootLayout() {
                   headerRight: () => <HeaderRight />,
                 }}
               />
+              <Stack.Screen
+                name="history"
+                options={{
+                  headerShown: true,
+                  headerTitle: "집중 기록",
+                  headerBackTitle: "뒤로",
+                  headerShadowVisible: false,
+                }}
+              />
             </Stack>
             <ColorPicker />
             <SettingsSheet />
-            <HistorySheet />
           </OverlayProvider>
         </BottomSheetModalProvider>
       </ThemeProvider>

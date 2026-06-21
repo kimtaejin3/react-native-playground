@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useSharedValue, withTiming, Easing } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
+import {
+  activateKeepAwakeAsync,
+  deactivateKeepAwake,
+} from "expo-keep-awake";
 import { RollingTime } from "../components/RollingTime";
 import { TimerControls } from "../components/TimerControls";
 import { EndModal } from "../components/EndModal";
@@ -11,21 +15,23 @@ import { useCountdown } from "../hooks/useCountdown";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Pomodoro() {
-  const { colors, maxMinutes, addSession } = useTheme();
+  const { colors, maxMinutes, addSession, hapticEnabled, keepAwakeEnabled } =
+    useTheme();
   const MAX_SECONDS = maxMinutes * 60;
 
   const progress = useSharedValue(0);
 
   const { minutes } = useMinuteDial(progress, maxMinutes);
 
-  const [running, setRunning] = useState(false);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
 
   const remainingSeconds = useCountdown(
-    running,
+    isTimerRunning,
     () => Math.round(progress.value * maxMinutes) * 60,
     {
       onTick: (sec) => {
-        if (sec <= 10) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (hapticEnabled && sec <= 10)
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
         progress.value = withTiming(sec / MAX_SECONDS, {
           duration: 1000,
@@ -34,17 +40,18 @@ export default function Pomodoro() {
       },
       onDone: (durationSec) => {
         progress.value = withTiming(0, { duration: 300 });
-        setRunning(false);
+        setIsTimerRunning(false);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         const doneMinutes = Math.round(durationSec / 60);
         overlay.open(({ isOpen, close }) => (
           <EndModal
             visible={isOpen}
             minutes={doneMinutes}
-            onSave={(activity) => {
+            onSave={({ title, content }) => {
               addSession({
                 minutes: doneMinutes,
-                activity,
+                title,
+                content,
                 completedAt: Date.now(),
               });
               close();
@@ -53,14 +60,23 @@ export default function Pomodoro() {
           />
         ));
       },
-      onEmpty: () => setRunning(false),
+      onEmpty: () => setIsTimerRunning(false),
     },
   );
 
   const displaySeconds = (() => {
-    if (running && remainingSeconds !== null) return remainingSeconds;
+    if (isTimerRunning && remainingSeconds !== null) return remainingSeconds;
     return minutes * 60;
   })();
+
+  // 실행 중에만 화면 켜둠 (설정으로 끌 수 있음)
+  useEffect(() => {
+    if (!(isTimerRunning && keepAwakeEnabled)) return;
+    activateKeepAwakeAsync();
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [isTimerRunning, keepAwakeEnabled]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -69,8 +85,8 @@ export default function Pomodoro() {
       </View>
       <TimerControls
         progress={progress}
-        running={running}
-        onToggle={() => setRunning((r) => !r)}
+        running={isTimerRunning}
+        onToggle={() => setIsTimerRunning((r) => !r)}
       />
     </View>
   );

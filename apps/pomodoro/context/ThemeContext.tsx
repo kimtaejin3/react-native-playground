@@ -21,7 +21,8 @@ export type ThemeColors = {
 export type Session = {
   id: string;
   minutes: number; // 집중 길이(분)
-  activity: string; // 무엇을 했는지
+  title: string; // 무엇을 했는지 (선택)
+  content: string; // 간단한 내용 (선택)
   completedAt: number; // 완료 시각(ms)
 };
 
@@ -63,15 +64,18 @@ type AppContextValue = {
   trackColor: string; // 슬라이더 트랙(빈 호) — 배경에 맞춰 조정
   maxMinutes: number;
   setMaxMinutes: (m: number) => void;
+  hapticEnabled: boolean; // 마지막 10초 진동 on/off
+  setHapticEnabled: (v: boolean) => void;
+  keepAwakeEnabled: boolean; // 실행 중 화면 켜둠 on/off
+  setKeepAwakeEnabled: (v: boolean) => void;
   sessions: Session[];
   addSession: (s: Omit<Session, "id">) => void;
+  updateSession: (id: string, patch: Pick<Session, "title" | "content">) => void;
   colorOpen: boolean; // 색상 플로팅 카드 표시 여부
   openColor: () => void;
   closeColor: () => void;
   settingsRef: RefObject<BottomSheetModal | null>;
-  historyRef: RefObject<BottomSheetModal | null>;
   openSettings: () => void;
-  openHistory: () => void;
 };
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -79,12 +83,13 @@ const AppContext = createContext<AppContextValue | null>(null);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [colors, setColors] = useState<ThemeColors>(DEFAULT);
   const [maxMinutes, setMaxMinutes] = useState(60);
+  const [hapticEnabled, setHapticEnabled] = useState(true);
+  const [keepAwakeEnabled, setKeepAwakeEnabled] = useState(true);
   const [sessions, setSessions] = useState<Session[]>([]);
   const idRef = useRef(0);
 
   const [colorOpen, setColorOpen] = useState(false);
   const settingsRef = useRef<BottomSheetModal>(null);
-  const historyRef = useRef<BottomSheetModal>(null);
   const loaded = useRef(false);
 
   // 폰에서 불러오기 (1회)
@@ -95,9 +100,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           const s = JSON.parse(raw);
           if (s.colors) setColors(s.colors);
           if (s.maxMinutes) setMaxMinutes(s.maxMinutes);
+          if (typeof s.hapticEnabled === "boolean")
+            setHapticEnabled(s.hapticEnabled);
+          if (typeof s.keepAwakeEnabled === "boolean")
+            setKeepAwakeEnabled(s.keepAwakeEnabled);
           if (Array.isArray(s.sessions)) {
-            setSessions(s.sessions);
-            idRef.current = s.sessions.reduce(
+            // 구버전(activity) → 신버전(title/content) 마이그레이션
+            const migrated: Session[] = s.sessions.map(
+              (x: Session & { activity?: string }) => ({
+                id: x.id,
+                minutes: x.minutes,
+                title: x.title ?? x.activity ?? "",
+                content: x.content ?? "",
+                completedAt: x.completedAt,
+              }),
+            );
+            setSessions(migrated);
+            idRef.current = migrated.reduce(
               (m: number, x: Session) => Math.max(m, Number(x.id) || 0),
               0,
             );
@@ -115,9 +134,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (!loaded.current) return;
     AsyncStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ colors, maxMinutes, sessions }),
+      JSON.stringify({
+        colors,
+        maxMinutes,
+        hapticEnabled,
+        keepAwakeEnabled,
+        sessions,
+      }),
     ).catch(() => {});
-  }, [colors, maxMinutes, sessions]);
+  }, [colors, maxMinutes, hapticEnabled, keepAwakeEnabled, sessions]);
 
   const setColor = (key: keyof ThemeColors, value: string) =>
     setColors((c) => ({ ...c, [key]: value }));
@@ -126,6 +151,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     idRef.current += 1;
     setSessions((prev) => [{ id: String(idRef.current), ...s }, ...prev]);
   };
+
+  const updateSession = (
+    id: string,
+    patch: Pick<Session, "title" | "content">,
+  ) =>
+    setSessions((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    );
 
   const iconColor = isDarkBg(colors.background)
     ? mix(colors.slider, "#ffffff", 0.55)
@@ -144,15 +177,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         trackColor,
         maxMinutes,
         setMaxMinutes,
+        hapticEnabled,
+        setHapticEnabled,
+        keepAwakeEnabled,
+        setKeepAwakeEnabled,
         sessions,
         addSession,
+        updateSession,
         colorOpen,
         openColor: () => setColorOpen(true),
         closeColor: () => setColorOpen(false),
         settingsRef,
-        historyRef,
         openSettings: () => settingsRef.current?.present(),
-        openHistory: () => historyRef.current?.present(),
       }}
     >
       {children}
