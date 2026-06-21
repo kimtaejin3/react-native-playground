@@ -1,5 +1,40 @@
 import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../context/ThemeContext";
+
+// 스와치 밝기로 체크마크 대비색 결정 (어두우면 흰 체크, 밝으면 검은 체크)
+const isDark = (hex: string) => {
+  const n = parseInt(hex.replace("#", ""), 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b < 140;
+};
+
+function Swatch({
+  color,
+  selected,
+  onPress,
+}: {
+  color: string;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[styles.swatch, { backgroundColor: color }]}
+    >
+      {selected && (
+        <Ionicons
+          name="checkmark"
+          size={20}
+          color={isDark(color) ? "#fff" : "#0f172a"}
+        />
+      )}
+    </Pressable>
+  );
+}
 
 const ACCENT = [
   "#0f172a",
@@ -46,14 +81,11 @@ export function ColorPicker() {
             <Text style={styles.label}>색상 (숫자·슬라이더)</Text>
             <View style={styles.swatches}>
               {ACCENT.map((c) => (
-                <Pressable
+                <Swatch
                   key={c}
+                  color={c}
+                  selected={colors.number.toLowerCase() === c}
                   onPress={() => setAccent(c)}
-                  style={[
-                    styles.swatch,
-                    { backgroundColor: c },
-                    colors.number.toLowerCase() === c && styles.swatchSelected,
-                  ]}
                 />
               ))}
             </View>
@@ -63,15 +95,11 @@ export function ColorPicker() {
             <Text style={styles.label}>배경</Text>
             <View style={styles.swatches}>
               {BG.map((c) => (
-                <Pressable
+                <Swatch
                   key={c}
+                  color={c}
+                  selected={colors.background.toLowerCase() === c}
                   onPress={() => setColor("background", c)}
-                  style={[
-                    styles.swatch,
-                    { backgroundColor: c },
-                    colors.background.toLowerCase() === c &&
-                      styles.swatchSelected,
-                  ]}
                 />
               ))}
             </View>
@@ -109,8 +137,9 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 9999,
-    borderWidth: 3,
-    borderColor: "#e2e8f0",
+    borderWidth: 1,
+    borderColor: "#e2e8f0", // 흰 스와치도 경계 보이게 얇은 테두리
+    alignItems: "center",
+    justifyContent: "center",
   },
-  swatchSelected: { borderWidth: 3, borderColor: "#0f172a" },
 });
