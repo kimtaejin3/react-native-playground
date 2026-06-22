@@ -2,12 +2,14 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
   type RefObject,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { debounce } from "es-toolkit";
 import type { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 const STORAGE_KEY = "pomodoro:v1";
@@ -129,11 +131,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+  // 잦은 변경(색 스와이프·타이핑)이 디스크 쓰기로 연타되지 않게 디바운스
+  const persist = useMemo(
+    () =>
+      debounce((value: string) => {
+        AsyncStorage.setItem(STORAGE_KEY, value).catch(() => {});
+      }, 400),
+    [],
+  );
+  useEffect(() => () => persist.flush(), [persist]); // 언마운트 시 마지막 값 보장
+
   // 변경 시 폰에 저장 (불러오기 완료 후부터)
   useEffect(() => {
     if (!loaded.current) return;
-    AsyncStorage.setItem(
-      STORAGE_KEY,
+    persist(
       JSON.stringify({
         colors,
         maxMinutes,
@@ -141,8 +152,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         keepAwakeEnabled,
         sessions,
       }),
-    ).catch(() => {});
-  }, [colors, maxMinutes, hapticEnabled, keepAwakeEnabled, sessions]);
+    );
+  }, [colors, maxMinutes, hapticEnabled, keepAwakeEnabled, sessions, persist]);
 
   const setColor = (key: keyof ThemeColors, value: string) =>
     setColors((c) => ({ ...c, [key]: value }));

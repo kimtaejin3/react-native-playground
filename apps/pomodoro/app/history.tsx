@@ -1,13 +1,23 @@
 import { useMemo } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { groupBy } from "es-toolkit";
 import { useTheme } from "../context/ThemeContext";
-import { groupByDay, fmtTime } from "../lib/sessions";
+import { fmtTime, dayKey, dayLabel } from "../lib/sessions";
 import { overlay } from "../lib/overlay";
 import { SessionEditModal } from "../components/SessionEditModal";
 
 export default function History() {
   const { sessions, updateSession } = useTheme();
-  const groups = useMemo(() => groupByDay(sessions), [sessions]);
+
+  // 날짜별로 묶어 보여줄 그룹 (라벨·합계는 화면 표시용)
+  const groups = useMemo(() => {
+    const byDay = groupBy(sessions, (s) => dayKey(s.completedAt));
+    return Object.values(byDay).map((items) => ({
+      label: dayLabel(items[0].completedAt),
+      total: items.reduce((sum, x) => sum + x.minutes, 0),
+      items,
+    }));
+  }, [sessions]);
 
   const openEdit = (id: string, title: string, content: string) => {
     overlay.open(({ isOpen, close }) => (

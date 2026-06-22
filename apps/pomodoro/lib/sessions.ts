@@ -1,5 +1,3 @@
-import type { Session } from "../context/ThemeContext";
-
 export const fmtTime = (ms: number) => {
   const d = new Date(ms);
   return `${String(d.getHours()).padStart(2, "0")}:${String(
@@ -7,12 +5,14 @@ export const fmtTime = (ms: number) => {
   ).padStart(2, "0")}`;
 };
 
-const dayKey = (ms: number) => {
+// 같은 날을 묶기 위한 키
+export const dayKey = (ms: number) => {
   const d = new Date(ms);
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 };
 
-const dayLabel = (ms: number) => {
+// 오늘/어제/M월 D일 라벨
+export const dayLabel = (ms: number) => {
   const d = new Date(ms);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -22,24 +22,3 @@ const dayLabel = (ms: number) => {
   if (diff === 1) return "어제";
   return `${d.getMonth() + 1}월 ${d.getDate()}일`;
 };
-
-export type DayGroup = {
-  label: string;
-  total: number; // 그날 총 집중 분
-  items: Session[];
-};
-
-// 날짜별 그룹 (sessions는 최신순으로 들어온다고 가정)
-export function groupByDay(sessions: Session[]): DayGroup[] {
-  const map = new Map<string, Session[]>();
-  for (const s of sessions) {
-    const k = dayKey(s.completedAt);
-    if (!map.has(k)) map.set(k, []);
-    map.get(k)!.push(s);
-  }
-  return Array.from(map.values()).map((items) => ({
-    label: dayLabel(items[0].completedAt),
-    total: items.reduce((sum, x) => sum + x.minutes, 0),
-    items,
-  }));
-}
